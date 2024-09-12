@@ -1,0 +1,15 @@
+# ---> DataFlex
+# DataFlex standard folders
+AppHtml/CssThemes/
+AppHtml/DfEngine/
+
+# DataFlex ignores
+*.dep
+*.prn
+*.dsk
+*.mtd
+*.loc
+*.dbg
+WebApp.exe
+WebApp.log
+
