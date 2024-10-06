@@ -234,6 +234,7 @@ Object oBugReportPanel is a cWebFloatingPanel
             Procedure_Return
         End
         WebSet pbRender of (oWebCheckboxSound(oWebGroupStart(Self))) to bIsUserMediaSupported
+        WebSet pbRender of oWebGroupStart to True
         WebSet pbRender of oWebGroupStop to False
         WebSet pbRender of oWebGroupConfirm to False
         
