@@ -10,6 +10,16 @@ AppHtml/DfEngine/
 *.mtd
 *.loc
 *.dbg
-WebApp.exe
-WebApp.log
+*.exe
+*.log
+*.fld
+*.pbg
+*.pdp
+*.pkd
+*.prp
 
+# Video files
+*.mp4
+*.mkv
+*.webm
+*.tmp

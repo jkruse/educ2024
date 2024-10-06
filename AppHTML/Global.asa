@@ -1,0 +1,28 @@
+<OBJECT RUNAT=Server SCOPE=Session ID=WebAppServerSession PROGID="WebAppServer.Session.24.0">
+</OBJECT>
+
+// @DFBuilder@ {"o":"version", "format":"PROGID=\"WebAppServer.Session.<major>.<minor>\"", "orig":"PROGID=\"WebAppServer.Session.99.0\""}
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Session_OnStart
+    WebAppServerSession.PageScopedSession=True
+    WebAppServerSession.Initialize("EDUC2024")
+    Session.Timeout=1
+
+END SUB
+</SCRIPT>
+
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Application_OnStart
+END SUB
+</SCRIPT>
+
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Application_OnEnd
+END SUB
+</SCRIPT>
+
+<SCRIPT LANGUAGE=VBScript RUNAT=Server>
+SUB Session_OnEnd
+END SUB
+</SCRIPT>
+

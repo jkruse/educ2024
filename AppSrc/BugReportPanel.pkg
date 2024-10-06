@@ -1,0 +1,224 @@
+﻿Use Windows.pkg
+Use cLocalWebControlHost.pkg
+Use cWebGroup.pkg
+Use cWebLabel.pkg
+Use cWebCheckbox.pkg
+Use cWebButton.pkg
+Use cWebHtmlBox.pkg
+Use cWebEdit.pkg
+Use WinUuid.pkg
+
+Use cMediaStreamAPI.pkg
+Use cMediaStreamRecordingAPI.pkg
+
+Object oBugReportPanel is a ToolPanel
+    // We do need this panel to be a bit bigger, because the screen share popup will show inside the cLocalWebControlHost below
+    Set Size to 250 400
+    Set Label to "Report a bug"
+
+    Property String psFileName ""
+    Property String psMimeType ""
+
+    Object oLocalWebControlHost is a cLocalWebControlHost
+        Set Size to 250 400
+        Set peAnchors to anAll
+
+        Object oUserMediaStream is a cUserMediaStreamAPI
+            Set pbAudio to True
+        End_Object
+        
+        Object oDisplayMediaStream is a cDisplayMediaStreamAPI
+            Set pbMonitorTypeSurfaces to False
+        End_Object
+        
+        Object oMediaStreamRecording is a cMediaStreamRecordingAPI
+            Set pbServerOnConnect to True
+            Set pbServerOnStart to True
+            Set pbServerOnDataAvailable to True
+            Set pbServerOnStop to True
+            
+            // Always add the display stream - user device (mic) stream added by checkbox below
+            Send AddStream oDisplayMediaStream
+    
+            // Auto-start recording when connection is established, in 1 second blocks
+            Procedure OnConnect String sState tMediaStreamInfo stInfo
+                Send Start 1000
+            End_Procedure
+    
+            Procedure OnStart String sState
+                String sTempFileName
+                
+                // Switch to the 'stop' view
+                WebSet pbRender of oWebGroupStart to False
+                WebSet pbRender of oWebGroupStop to True
+                
+                // Keeping it simple - create a file to store the recording in
+                Make_Temp_File "tmp" sTempFileName
+                Set psFileName of oBugReportPanel to sTempFileName
+                Set psMimeType of oBugReportPanel to "" // We will get the mime type in OnDataAvailable
+            End_Procedure
+    
+            Procedure OnDataAvailable String sMimeType UChar[] ucData
+                String sRememberedMimeType sTempFileName
+    
+                Send ClientLog (SFormat("Received %1 bytes of %2", SizeOfArray(ucData), sMimeType))
+                
+                // Remember the mime type
+                Get psMimeType of oBugReportPanel to sRememberedMimeType
+                If (sRememberedMimeType = "") Begin
+                    Set psMimeType of oBugReportPanel to sMimeType
+                End
+    
+                // Write data to temp file
+                Get psFileName of oBugReportPanel to sTempFileName
+                Append_Output ("binary: " + sTempFileName)
+                Write ucData
+                Close_Output
+            End_Procedure
+    
+            Procedure OnStop String sState
+                // Switch to the 'confirm' view
+                WebSet pbRender of oWebGroupStop to False
+                WebSet pbRender of oWebGroupConfirm to True
+                
+                // Show recording to user
+                Send AttachRecording "my-video-element"
+            End_Procedure
+        End_Object
+
+        Object oWebGroupStart is a cWebGroup
+            Set piColumnCount to 3
+            Set pbShowBorder to False
+            Set pbShowCaption to False
+    
+            Object oWebLabel1 is a cWebLabel
+                Set piColumnSpan to 0
+                Set psCaption to "Found a bug? We are so sorry! We would love it, if you would click 'Start screen recording' below, and show us what happened."
+            End_Object
+        
+            Object oWebCheckbox1 is a cWebCheckbox
+                Set piColumnSpan to 0
+                Set psCaption to "Include sound from my microphone, so I can explain"
+                Set pbServerOnChange to True
+        
+                // Only adding the user device stream to recording if checkbox is checked
+                Procedure OnChange String sNewValue String sOldValue
+                    Boolean bChecked
+                    Get GetChecked to bChecked
+                    If (bChecked) Begin
+                        Send AddStream of oMediaStreamRecording oUserMediaStream
+                    End
+                    Else Begin
+                        Send RemoveStream of oMediaStreamRecording oUserMediaStream
+                    End
+                End_Procedure
+            End_Object
+        
+            Object oWebButton1 is a cWebButton
+                Set piColumnSpan to 3
+                Set psCaption to "Start screen recording"
+            
+                Procedure OnClick
+                    Send Connect of oMediaStreamRecording
+                End_Procedure
+            End_Object
+        End_Object
+    
+        Object oWebGroupStop is a cWebGroup
+            Set pbShowBorder to False
+            Set pbShowCaption to False
+            Set pbRender to False
+    
+            Object oWebButton3 is a cWebButton
+                Set psCaption to "Stop recording"
+            
+                Procedure OnClick
+                    // Will also trigger OnStop
+                    Send Disconnect of oMediaStreamRecording
+                End_Procedure
+            End_Object
+        End_Object
+        
+        Object oWebGroupConfirm is a cWebGroup
+            Set piColumnCount to 3
+            Set pbShowBorder to False
+            Set pbShowCaption to False
+            Set pbRender to False
+    
+            Object oVideo is a cWebHtmlBox
+                Set piColumnSpan to 0
+                Set psHtml to '<video controls style="width: 100%" id="my-video-element"></video>'
+            End_Object
+    
+            Object oWebEdit1 is a cWebEdit
+                Set piColumnSpan to 0
+                Set psLabel to "Please provide any relevant details:"
+                Set peLabelPosition to lpTop
+            End_Object
+            
+            Object oWebButton4 is a cWebButton
+                Set piColumnSpan to 2
+                Set psCaption to "Submit bug report"
+                
+                Procedure OnClick
+                    String sMimeType sExtension sFileName
+                    
+                    Get psMimeType of oBugReportPanel to sMimeType
+                    If (sMimeType matches "video/mp4*") Begin
+                        Move ".mp4" to sExtension
+                    End
+                    Else If (sMimeType matches "video/x-matroska*") Begin
+                        Move ".mkv" to sExtension
+                    End
+                    Else If (sMimeType matches "video/webm*") Begin
+                        Move ".webm" to sExtension
+                    End
+                    Else Begin
+                        Move ".tmp" to sExtension
+                    End
+    
+                    Get psFileName of oBugReportPanel to sFileName
+                    RenameFile sFileName to (RandomHexUUID() + sExtension)
+                    Set psFileName of oBugReportPanel to ""
+                    
+                    //TODO: Store this recording along with any other relevant information
+                    
+                    Send Deactivate of oBugReportPanel
+    
+                    Send Info_Box "Your bug report has been saved, and we will get back to you ASAP!" "Thank you"
+                End_Procedure
+            End_Object
+    
+            Object oWebButton5 is a cWebButton
+                Set piColumnIndex to 2
+                Set piColumnSpan to 1
+                Set psCaption to "Cancel"
+                
+                Procedure OnClick
+                    Send Deactivate of oBugReportPanel
+                End_Procedure
+            End_Object
+        End_Object
+
+        Procedure OnDefineScriptIncludes String[]  ByRef aScriptHtml
+            Move '<script src="Custom/index.js"></script>' to aScriptHtml[SizeOfArray(aScriptHtml)]
+        End_Procedure
+
+        Procedure OnPermissionRequested String sUrl OLECOREWEBVIEW2_PERMISSION_KIND eKind Boolean isUserInitiated OLECOREWEBVIEW2_PERMISSION_STATE ByRef eState
+            // Auto-approve any permission request (only microphone permission will be asked)
+            Move OLECOREWEBVIEW2_PERMISSION_STATE_ALLOW to eState
+        End_Procedure
+    End_Object
+
+    Procedure Deactivating
+        String sTempFileName
+
+        Forward Send Deactivating
+
+        Get psFileName to sTempFileName
+        If (sTempFileName <> "") Begin
+            EraseFile sTempFileName
+        End
+    End_Procedure
+
+End_Object

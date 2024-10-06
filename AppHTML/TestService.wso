@@ -1,0 +1,7 @@
+[WebService]
+Application=EDUC2024
+Object=oTestService
+ServicePageGenerator=DefaultWebServiceHomePage.xslt
+TestPageGenerator=DefaultWebServiceMethodPage.xslt
+WSDLGenerator=DefaultWebServiceDescription.xslt
+SoapBodyStyle=document

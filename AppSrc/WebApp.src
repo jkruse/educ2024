@@ -1,0 +1,439 @@
+﻿Use AllWebAppClasses.pkg
+Use cWebMenuItem.pkg
+
+Define Use$WebLookups
+
+Register_Object oDashboard
+
+Object oApplication is a cApplication
+
+    Object oConnection is a cConnection
+        Use LoginEncryption.pkg
+    End_Object
+
+End_Object
+
+Object oWebApp is a cWebApp
+    Set psTheme to "Df_Material"
+    Set peAlignView to alignCenter
+    Set psApplicationTitle to ("Web Order Touch " + String(PKG_Version) + "." + String(PKG_Revision))
+
+    // It is important to set this so that all views will default
+    // to drill down style views.
+    Set peApplicationStyle to wvsDrillDown
+    Set peApplicationStateMode to asmHistoryAndUrls
+
+//    Procedure OnLoad
+//        Boolean bOk
+//        Get UserLogin of ghoWebSessionManager "john" "John" to bOk
+//    End_Procedure
+
+    Object oViewStack is a cWebViewStack
+        // use ghoWebViewStack to reference this object
+    End_Object
+
+    Procedure HideHeader
+        WebSet pbRender of oHeaderPanel to False
+    End_Procedure
+
+    Procedure ShowHeader
+        WebSet pbRender of oHeaderPanel to True
+    End_Procedure
+
+    Object oHeaderPanel is a cWebPanel
+        Set peRegion to prTop
+        Set psCSSClass to "HeaderPanel"
+
+        Object oMenuPanel is a cWebPanel
+            Set peRegion to prLeft
+            Set piWidth to 50
+
+            Object oMenuButton is a cWebMenuButton
+                Set piMenuHeight to 500
+
+                Object oDashboard_itm is a cWebMenuItem
+                    Set psCaption to "Dashboard"
+
+                    WebRegisterPath ntNavigateBegin oDashboard
+
+                    Procedure OnClick
+                        Send NavigatePath
+                    End_Procedure
+                End_Object
+
+                Object oCustomer_itm is a cWebMenuItem
+                    Set psCaption to "Customer Query"
+
+                    WebRegisterPath ntNavigateBegin oSelectOrdersByCustomer
+
+                    Procedure OnClick
+                        Send NavigatePath
+                    End_Procedure
+                End_Object
+
+                Object oSalesP_itm is a cWebMenuItem
+                    Set psCaption to "Sales Person Query"
+
+                    WebRegisterPath ntNavigateBegin oSelectSalesPerson
+
+                    Procedure OnClick
+                        Send NavigatePath
+                    End_Procedure
+                End_Object
+
+                Object oOrder_itm is a cWebMenuItem
+                    Set psCaption to "Orders Query"
+
+                    WebRegisterPath ntNavigateBegin oSelectOrder
+
+                    Procedure OnClick
+                        Send NavigatePath
+                    End_Procedure
+                End_Object
+
+                Object oDemo_itm is a cWebMenuItem
+                    Set psCaption to "Demo Techniques"
+
+                    Object oDialogs_itm is a cWebMenuItem
+                        Set psCaption to "Modal Dialogs"
+
+                        WebRegisterPath ntNavigateBegin oDemoDialogs
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+
+                    Object oCSSClasses_itm is a cWebMenuItem
+                        Set psCaption to "Extended CSS Classes"
+
+                        WebRegisterPath ntNavigateBegin oDemoCSSClasses
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+
+                    Object oExpandableWebListPanel_itm is a cWebMenuItem
+                        Set psCaption to "Expandable List Panel"
+
+                        WebRegisterPath ntNavigateBegin oDemoExpandPanel
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+
+                    Object oSlider_Itm is a cWebMenuItem
+                        Set psCaption to "Sliders and Tab Dialogs"
+
+                        WebRegisterPath ntNavigateBegin oDemoSliders
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+
+                    Object oCheckboxRadio_Itm is a cWebMenuItem
+                        Set psCaption to "Styled Checkboxes & Radios"
+
+                        WebRegisterPath ntNavigateBegin oDemoCheckboxRadio
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+
+                    Object oDemoCustomFwdNavigations_itm is a cWebMenuItem
+                        Set psCaption to "Custom Forward Navigations"
+
+                        WebRegisterPath ntNavigateBegin oDemoCustomFwdNavigations
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+
+                        Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                            Move True to NavigateData.bNewRecord
+                        End_Procedure
+                    End_Object
+
+                    Object oDemoSwipableCards_itm is a cWebMenuItem
+                        Set psCaption to "Swipable Cards"
+
+                        WebRegisterPath ntNavigateBegin oDemoSwipableCards
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+
+                    Object oDemoGeoLocation_itm is a cWebMenuItem
+                        Set psCaption to "Geolocation API"
+
+                        WebRegisterPath ntNavigateBegin oDemoGeoLocation
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+                    
+                    Object oDemoGrouping_itm is a cWebMenuItem
+                        Set psCaption to "Grouping"
+
+                        WebRegisterPath ntNavigateBegin oDemoGrouping
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+                    End_Object
+                    
+                End_Object
+
+                Object oMaintenance_itm is a cWebMenuItem
+                    Set psCaption to "Maintenance"
+
+                    Object oSalesPersons_itm is a cWebMenuItem
+                        Set psCaption to "Sales Persons"
+
+                        WebRegisterPath ntNavigateBegin oSelectSalesPerson
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+
+                        Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                            Get NamedValueAdd NavigateData.NamedValues "task" "maint" to NavigateData.NamedValues
+                        End_Procedure
+                    End_Object
+
+                    Object oCustomer_itm is a cWebMenuItem
+                        Set psCaption to "Customers"
+
+                        WebRegisterPath ntNavigateBegin oSelectCustomer
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+
+                        Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                            Get NamedValueAdd NavigateData.NamedValues "task" "maint" to NavigateData.NamedValues
+                        End_Procedure
+                    End_Object
+
+                    Object oVendor_itm is a cWebMenuItem
+                        Set psCaption to "Vendors"
+
+                        WebRegisterPath ntNavigateBegin oSelectVendor
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+
+                        Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                            Get NamedValueAdd NavigateData.NamedValues "task" "maint" to NavigateData.NamedValues
+                        End_Procedure
+                    End_Object
+
+                    Object oInventory_itm is a cWebMenuItem
+                        Set psCaption to "Products"
+
+                        WebRegisterPath ntNavigateBegin oSelectInventory
+
+                        Procedure OnClick
+                            Send NavigatePath
+                        End_Procedure
+
+                        Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                            Get NamedValueAdd NavigateData.NamedValues "task" "maint" to NavigateData.NamedValues
+                        End_Procedure
+                    End_Object
+                End_Object
+
+                Object oSignOut_itm is a cWebMenuItem
+                    Set psCaption to "Sign Out"
+
+                    Procedure OnClick
+                        Send RequestLogOut of ghoWebSessionManager
+                    End_Procedure
+                End_Object
+            End_Object
+
+            Object oBackButton is a cWebButton
+                Set psCSSClass to "WebBack_Icon"
+                Set pbRender to False
+
+                Procedure OnClick
+                    Handle hoTop
+
+                    Get TopViewHandle of ghoWebViewStack to hoTop
+                    If (hoTop > 0) Begin
+                        Send NavigateCancel of hoTop
+                    End
+                End_Procedure
+            End_Object
+
+            Send AddClient of ghoWebViewStack Self
+
+            Procedure OnUpdateViewStack
+                Handle hoTop hoDflt
+                Integer eMode
+                Boolean bTop
+
+                WebGet peMode of ghoWebApp to eMode
+
+                Get TopViewHandle of ghoWebViewStack to hoTop
+                Get GetDefaultView to hoDflt
+                Move (hoTop=0 or hoTop=hoDflt) to bTop
+
+                WebSet pbRender of oBackButton to (not(bTop) and eMode >= rmMobile)
+                WebSet pbRender of oMenuButton to (bTop or eMode < rmMobile)
+            End_Procedure
+        End_Object
+
+        Object oCaptionPanel is a cWebPanel
+            Set piColumnCount to 12
+
+            Object oCaptionBreadcrumb is a cWebBreadcrumb
+                Set peBreadcrumbStyle to crumbCaption
+                WebSetResponsive peBreadcrumbStyle rmMobile to crumbDropDown
+            End_Object
+        End_Object
+
+        Object oActionPanel is a cWebPanel
+            Set peRegion to prRight
+            Set piColumnCount to 1
+            Set piWidth to 120
+
+            Object oMainActions is a cWebActionBar
+                Set piColumnSpan to 0
+                Set peAlign to alignRight
+
+                Object oWebMenuItem1 is a cWebMenuItem
+                    Set psCaption to "Record screen"
+                    Set psCSSClass to "WebIcon_Bug"
+                    Set peActionDisplay to adActionBar
+
+                    Procedure OnClick
+                        Send Show of oBugReportPanel
+                    End_Procedure
+                End_Object
+            End_Object
+        End_Object
+
+        Object oBreadcrumbPanel is a cWebPanel
+            Set peRegion to prBottom
+            WebSetResponsive pbRender rmMobile to False
+
+            Object oHorizontalBreadcrumb is a cWebBreadcrumb
+                // Do not render this breadcrumb if there is only the Dashboard view in
+                // the stack
+                Procedure OnUpdateViewStack
+                    Integer iCount
+                    Get ViewStackSize of ghoWebViewStack to iCount
+                    WebSet pbRender to (iCount > 1)
+
+                    Forward Send OnUpdateViewStack
+                End_Procedure
+            End_Object
+        End_Object
+    End_Object
+
+    Use BugReportPanel.wo
+
+    Use SessionManager.wo
+    Use WebResourceManager.wo
+
+    Use SelectCustomer.wo
+    Use ZoomCustomer.wo
+
+    Use SelectOrder.wo
+    Use ZoomOrder.wo
+
+    Use SelectSalesPerson.wo
+    Use ZoomSalesPerson.wo
+
+    Use ZoomVendor.wo
+    Use SelectVendor.wo
+
+    Use SelectInventory.wo
+    Use ZoomInventory.wo
+
+    Use Login.wo
+    Use ZoomOrderDetail.wo
+
+    Use Dashboard.wo
+    Use DemoDialogs.wo
+    Use DemoCSSClasses.wo
+    Use DemoSliders.wo
+    Use DemoCustomFwdNavigations.wo
+    Use DemoCheckboxRadio.wo
+    Use DemoSwipableCards.wo
+    Use SelectOrdersByCustomer.wo
+    Use DemoExpandPanel.wo
+    Use DemoGeoLocation.wo
+    Use DemoGrouping.wo
+    
+    Set phoDefaultView to oDashboard
+
+    // Generates a string of 40 random characters between ASCII 33 & ASCII 126
+    // This should produce a unique string suitable for a 16 character encryption key.
+    // Excludes the ;"' characters.
+    //
+    // Used by WebApps to give the psEncryptPassword property a unique value.
+    Function GenerateEncryptString Returns String
+        Integer i iASCII
+        String sChar sKey
+
+        For i from 0 to 39
+            Move (Random(93)) to iASCII
+            Move (iASCII + 34) to iASCII
+
+            If (iASCII = 34 or iASCII = 39 or iASCII = 59) Begin
+                Increment iASCII
+            End
+
+            Move (Character(iASCII)) to sChar
+            Move (sKey + sChar) to sKey
+        Loop
+
+        Function_Return sKey
+    End_Function
+
+
+    Procedure InitPassword
+        // Note to the developer: For security purposes each installation of the this workspace must
+        // contain a unique value for the framework's encryption key. This value is stored in the cWebApp
+        // object's psEncryptPassword property.
+        //
+        // To ensure each running installation of WebOrder is different we have modified the Web App
+        // to generate a random psEncryptPassword value the first time that it is run. This value is
+        // then used and is stored in the OrdSys system table so that it does not get re-generated
+        // in subsequent instances of this web application.
+        //
+        // Since this workspace is installed and run automatically when you install DataFlex we are required
+        // to ensure that the encryption password cannot be guessed. Normally you would not need, or want, to
+        // use this technique in your own web applications. Instead you would manually set psEncryptPassword
+        // to a trusted, unique value for each web application that you deploy.
+
+
+        // Test if an encryption password has already been generated.
+        If (Trim(OrderSystem.EncryptPassword) = "") Begin
+            Reread OrderSystem
+            // Just in case another instance wrote to OrdSys.EncryptPassword in the millisecond
+            // between the above two lines of code we will test this value again
+            If (Trim(OrderSystem.EncryptPassword) = "") Begin
+                Get GenerateEncryptString to OrderSystem.EncryptPassword
+                SaveRecord OrderSystem
+            End
+            Unlock
+        End
+
+        Set psEncryptPassword to (Trim(OrderSystem.EncryptPassword))
+    End_Procedure
+
+    Send InitPassword
+End_Object
+
+Send StartWebApp of oWebApp
+

@@ -1,0 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
+
+.WebIcon_Bug>div>span.WebItm_Icon:before {
+    /* Bug Icon */
+    font-family: 'Material Symbols Outlined' !important;
+    content: "\e868";
+    font-size: 22px;
+    padding: 8px 0 0 0 !important;
+}

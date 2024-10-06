@@ -1,0 +1,12 @@
+[Properties]
+Version=24.0
+[WorkspacePaths]
+ConfigFile=.\Programs\Config.ws
+[Conditionals]
+Is$WebApp=False
+Is$Win64=True
+[Libraries]
+[Projects]
+Project0=WebApp.src
+Project1=OrderMobile.src
+Project2=Order.src
